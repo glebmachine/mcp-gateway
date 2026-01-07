@@ -1,0 +1,28 @@
+{
+  "servers": [
+    {
+      "name": "playwright",
+      "description": "Playwright MCP - автоматизация браузера для тестирования и скрапинга",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp", "--browser", "chromium"],
+      "port": 8931,
+      "enabled": true
+    },
+    {
+      "name": "chrome-devtools",
+      "description": "Chrome DevTools MCP - отладка браузера через CDP",
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "port": 8932,
+      "enabled": true
+    },
+    {
+      "name": "mobile",
+      "description": "Mobile MCP - автоматизация Android (ADB) и iOS Simulator (simctl)",
+      "command": "npx",
+      "args": ["-y", "claude-in-mobile"],
+      "port": 8933,
+      "enabled": true
+    }
+  ]
+}

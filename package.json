@@ -1,0 +1,22 @@
+{
+  "name": "mcp-gateway",
+  "version": "1.0.0",
+  "description": "MCP Gateway - Central hub for MCP servers accessible from WSL",
+  "main": "src/gateway.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/gateway.js",
+    "stop": "node src/gateway.js --stop",
+    "status": "node src/gateway.js --status",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop mcp-gateway",
+    "pm2:restart": "pm2 restart mcp-gateway",
+    "pm2:logs": "pm2 logs mcp-gateway",
+    "pm2:status": "pm2 status"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
