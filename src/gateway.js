@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
 import { spawn } from 'child_process';
-import { readFileSync, writeFileSync, existsSync, unlinkSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer } from 'net';
 import { createServer as createHttpServer } from 'http';
 import { networkInterfaces } from 'os';
-import { createInterface } from 'readline';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,9 +26,13 @@ const colors = {
   dim: '\x1b[2m'
 };
 
-function log(msg, color = 'reset') {
-  const timestamp = new Date().toISOString().substr(11, 8);
-  console.log(`${colors.dim}[${timestamp}]${colors.reset} ${colors[color]}${msg}${colors.reset}`);
+function log(msg, color = 'reset', noTimestamp = false) {
+  if (noTimestamp) {
+    console.log(`${colors[color]}${msg}${colors.reset}`);
+  } else {
+    const timestamp = new Date().toISOString().substr(11, 8);
+    console.log(`${colors.dim}[${timestamp}]${colors.reset} ${colors[color]}${msg}${colors.reset}`);
+  }
 }
 
 function loadConfig() {
@@ -82,96 +85,6 @@ async function isPortAvailable(port) {
 
 async function checkPortInUse(port) {
   return !(await isPortAvailable(port));
-}
-
-// Проверка установленных зависимостей
-function checkPlaywrightBrowsers() {
-  // Проверяем наличие директории с браузерами Playwright
-  const homeDir = process.env.HOME || process.env.USERPROFILE;
-  const localAppData = process.env.LOCALAPPDATA;
-
-  // Windows: %LOCALAPPDATA%\ms-playwright
-  // macOS/Linux: ~/.cache/ms-playwright
-  const possiblePaths = [
-    localAppData ? join(localAppData, 'ms-playwright') : null,
-    homeDir ? join(homeDir, '.cache', 'ms-playwright') : null
-  ].filter(Boolean);
-
-  for (const dir of possiblePaths) {
-    if (existsSync(dir)) {
-      // Проверяем что там есть хотя бы одна директория с браузером
-      try {
-        const files = readdirSync(dir);
-        if (files.some(f => f.startsWith('chromium'))) {
-          return true;
-        }
-      } catch {
-        // ignore
-      }
-    }
-  }
-  return false;
-}
-
-// Интерактивный диалог
-async function askUser(question) {
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase().trim());
-    });
-  });
-}
-
-// Установка зависимостей
-async function installPlaywrightBrowsers() {
-  log('Устанавливаю браузеры Playwright...', 'cyan');
-  return new Promise((resolve) => {
-    const proc = spawn('npx', ['playwright', 'install'], {
-      stdio: 'inherit',
-      shell: true
-    });
-    proc.on('close', (code) => {
-      if (code === 0) {
-        log('Браузеры Playwright установлены!', 'green');
-        resolve(true);
-      } else {
-        log('Ошибка установки браузеров', 'red');
-        resolve(false);
-      }
-    });
-  });
-}
-
-// Проверка зависимостей перед запуском
-async function checkDependencies(config) {
-  const hasPlaywright = config.servers.some(s =>
-    s.enabled && s.args?.some(a => a.includes('playwright'))
-  );
-
-  if (hasPlaywright && !checkPlaywrightBrowsers()) {
-    log('', 'reset');
-    log('Playwright MCP включён, но браузеры не установлены', 'yellow');
-    log('', 'reset');
-
-    const answer = await askUser(
-      `${colors.cyan}Установить браузеры автоматически? [Y/n]: ${colors.reset}`
-    );
-
-    if (answer === '' || answer === 'y' || answer === 'yes' || answer === 'д' || answer === 'да') {
-      await installPlaywrightBrowsers();
-    } else {
-      log('', 'reset');
-      log('Установи вручную: npx playwright install', 'yellow');
-      log('Playwright MCP может не работать без браузеров', 'dim');
-      log('', 'reset');
-    }
-  }
 }
 
 class MCPGateway {
@@ -401,12 +314,12 @@ Endpoints:
     log('Вариант 1: Команды для Claude Code CLI', 'yellow');
     log('', 'reset');
     enabledServers.forEach(server => {
-      log(`  claude mcp add ${server.name} -s user -- npx -y mcp-remote "http://${this.hostIP}:${server.port}/sse" --allow-http`, 'reset');
+      log(`  claude mcp add ${server.name} -s user -- npx -y mcp-remote "http://${this.hostIP}:${server.port}/sse" --allow-http`, 'reset', true);
     });
     log('', 'reset');
-    log('Вариант 2: Скачать .mcp.json (IP определится автоматически)', 'yellow');
+    log('Вариант 2: Скачать .mcp.json', 'yellow');
     log('', 'reset');
-    log(`  curl http://$(ip route | grep default | awk '{print $3}'):${CONFIG_SERVER_PORT}/config.json > .mcp.json`, 'reset');
+    log(`  curl http://${this.hostIP}:${CONFIG_SERVER_PORT}/config.json > .mcp.json`, 'reset', true);
     log('', 'reset');
     log('После настройки перезапустите Claude Code', 'dim');
     log('', 'reset');
@@ -511,9 +424,5 @@ if (args.includes('--status')) {
     log('Gateway is not running', 'yellow');
   }
 } else {
-  // Проверяем зависимости перед запуском
-  (async () => {
-    await checkDependencies(gateway.config);
-    gateway.startAll();
-  })();
+  gateway.startAll();
 }

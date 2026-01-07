@@ -4,7 +4,7 @@
       "name": "playwright",
       "description": "Playwright MCP - автоматизация браузера для тестирования и скрапинга",
       "command": "npx",
-      "args": ["-y", "@playwright/mcp", "--browser", "chromium"],
+      "args": ["-y", "@playwright/mcp"],
       "port": 8931,
       "enabled": true
     },

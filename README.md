@@ -32,8 +32,7 @@ npx mcp-gateway
 
 ```bash
 npm install -g mcp-gateway
-npx playwright install   # для Playwright MCP
-mcp-gateway              # запуск
+mcp-gateway
 ```
 
 ### Или из исходников (для разработки)
@@ -42,7 +41,6 @@ mcp-gateway              # запуск
 git clone https://github.com/glebmachine/mcp-gateway.git
 cd mcp-gateway
 npm install
-npx playwright install   # для Playwright MCP
 npm run pm2:start        # запуск в фоне
 ```
 
@@ -201,8 +199,9 @@ curl http://<host-ip>:8930/
 ```
 
 **Playwright не работает**
-```bash
-npx playwright install   # Установи браузеры
+```
+Убедись что Chrome или Chromium установлен в системе.
+Playwright MCP использует системный браузер по умолчанию.
 ```
 
 **Chrome DevTools не подключается**
