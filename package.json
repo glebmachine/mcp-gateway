@@ -1,9 +1,40 @@
 {
   "name": "mcp-gateway",
   "version": "1.0.0",
-  "description": "MCP Gateway - Central hub for MCP servers accessible from WSL",
+  "description": "Exposes local MCP servers to WSL, Docker, and remote machines",
+  "author": "Gleb Mikheev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glebmachine/mcp-gateway.git"
+  },
+  "bugs": {
+    "url": "https://github.com/glebmachine/mcp-gateway/issues"
+  },
+  "homepage": "https://github.com/glebmachine/mcp-gateway#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "wsl",
+    "docker",
+    "gateway",
+    "stdio",
+    "sse",
+    "claude",
+    "anthropic",
+    "playwright",
+    "devtools"
+  ],
   "main": "src/gateway.js",
+  "bin": {
+    "mcp-gateway": "src/gateway.js"
+  },
   "type": "module",
+  "files": [
+    "src",
+    "config.json",
+    "ecosystem.config.cjs"
+  ],
   "scripts": {
     "start": "node src/gateway.js",
     "stop": "node src/gateway.js --stop",
@@ -14,7 +45,9 @@
     "pm2:logs": "pm2 logs mcp-gateway",
     "pm2:status": "pm2 status"
   },
-  "dependencies": {},
+  "dependencies": {
+    "supergateway": "^3.4.3"
+  },
   "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"

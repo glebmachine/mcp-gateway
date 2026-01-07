@@ -22,8 +22,24 @@ Windows: MCP Server (stdio) → MCP Gateway (HTTP/SSE) → WSL: Claude Code
 
 ## Установка на машине разработчика
 
+### Быстрый запуск (npx)
+
 ```bash
-git clone https://github.com/glebm/mcp-gateway.git
+npx mcp-gateway
+```
+
+### Или установка глобально
+
+```bash
+npm install -g mcp-gateway
+npx playwright install   # для Playwright MCP
+mcp-gateway              # запуск
+```
+
+### Или из исходников (для разработки)
+
+```bash
+git clone https://github.com/glebmachine/mcp-gateway.git
 cd mcp-gateway
 npm install
 npx playwright install   # для Playwright MCP
